@@ -232,6 +232,16 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query })
     });
+    if (!res.ok) {
+      let errorMsg = `Server returned status ${res.status}`;
+      try {
+        const errJson = await res.json();
+        if (errJson && errJson.detail) {
+          errorMsg = typeof errJson.detail === 'string' ? errJson.detail : JSON.stringify(errJson.detail);
+        }
+      } catch (_) {}
+      throw new Error(errorMsg);
+    }
     return res.json();
   },
 

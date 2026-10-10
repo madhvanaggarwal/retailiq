@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.services.consultant_service import answer_consultant_query
 
@@ -9,4 +9,6 @@ class QueryRequest(BaseModel):
 
 @router.post("/query")
 def ask_consultant(req: QueryRequest):
-    return answer_consultant_query(req.query)
+    if not req.query or not req.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+    return answer_consultant_query(req.query.strip())
