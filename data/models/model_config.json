@@ -1,0 +1,220 @@
+{
+  "forecast": {
+    "model_file": "sales_forecaster_xgb.ubj",
+    "target": "log1p(Sales); predict with expm1()",
+    "features_in_order": [
+      "Store",
+      "DayOfWeek",
+      "Day",
+      "Month",
+      "Year",
+      "WeekOfYear",
+      "DayOfYear",
+      "Promo",
+      "StateHoliday",
+      "SchoolHoliday",
+      "StoreType",
+      "Assortment",
+      "CompetitionDistance",
+      "CompetitionMonthsOpen",
+      "Promo2",
+      "Promo2Weeks",
+      "StoreMeanSales",
+      "StoreMeanCustomers",
+      "StoreSalesPerCust",
+      "StoreDowMean",
+      "StorePromoMean",
+      "StoreMonthMean",
+      "StoreDowPromoMean",
+      "StoreRecentTrend",
+      "Promo2Active",
+      "DaysToHoliday",
+      "DaysAfterHoliday"
+    ],
+    "train_period": [
+      "2013-01-01",
+      "2015-06-19"
+    ],
+    "test_period": [
+      "2015-06-20",
+      "2015-07-31"
+    ],
+    "rows_used": "open days with Sales > 0",
+    "encodings": {
+      "StoreType": {
+        "a": 0,
+        "b": 1,
+        "c": 2,
+        "d": 3
+      },
+      "Assortment": {
+        "a": 0,
+        "b": 1,
+        "c": 2
+      },
+      "StateHoliday": {
+        "none/0": 0,
+        "a": 1,
+        "b": 2,
+        "c": 3
+      }
+    },
+    "derived_features": {
+      "CompetitionMonthsOpen": "(Year-CompetitionOpenSinceYear)*12 + (Month-CompetitionOpenSinceMonth), -1 if unknown, clipped [-1,240]",
+      "Promo2Weeks": "(Year-Promo2SinceYear)*52 + (WeekOfYear-Promo2SinceWeek), -1 if none, clipped [-1,300]",
+      "Promo2Active": "1 if store's PromoInterval contains the current month and Promo2 has started",
+      "DaysToHoliday / DaysAfterHoliday": "days to next / since last public (state) holiday, clipped [0,30]",
+      "Store* lookup features": "see lookup/*.csv (means from the training period only)"
+    },
+    "missing_value_fills": {
+      "CompetitionDistance": "2 x max distance",
+      "CompetitionOpenSince*/Promo2Since*": 0
+    },
+    "xgb_params": {
+      "objective": "reg:squarederror",
+      "base_score": null,
+      "booster": null,
+      "callbacks": null,
+      "colsample_bylevel": null,
+      "colsample_bynode": null,
+      "colsample_bytree": 0.7,
+      "device": null,
+      "early_stopping_rounds": null,
+      "enable_categorical": true,
+      "eval_metric": null,
+      "feature_types": null,
+      "feature_weights": null,
+      "gamma": null,
+      "grow_policy": null,
+      "importance_type": null,
+      "interaction_constraints": null,
+      "learning_rate": 0.05,
+      "max_bin": null,
+      "max_cat_threshold": null,
+      "max_cat_to_onehot": null,
+      "max_delta_step": null,
+      "max_depth": 10,
+      "max_leaves": null,
+      "min_child_weight": null,
+      "missing": NaN,
+      "monotone_constraints": null,
+      "multi_strategy": null,
+      "n_estimators": 800,
+      "n_jobs": 2,
+      "num_parallel_tree": null,
+      "random_state": 42,
+      "reg_alpha": null,
+      "reg_lambda": null,
+      "sampling_method": null,
+      "scale_pos_weight": null,
+      "subsample": 0.8,
+      "tree_method": "hist",
+      "validate_parameters": null,
+      "verbosity": null
+    },
+    "test_metrics": {
+      "RMSE (\u20ac)": 839.8622,
+      "MAPE (%)": 8.0328,
+      "R\u00b2": 0.9244,
+      "RMSPE (Kaggle, %)": 11.3419
+    }
+  },
+  "risk_classifier": {
+    "model_file": "risk_classifier_xgb.json",
+    "deploy_model_file": "risk_classifier_xgb_deploy.json",
+    "features_in_order": [
+      "avg_daily_sales",
+      "yoy_growth_last_q",
+      "qoq_growth",
+      "intra_q_trend",
+      "customers_yoy",
+      "sales_per_customer",
+      "store_type_b",
+      "assortment_extended",
+      "competition_km",
+      "new_competitor_12m",
+      "competitor_opens_next_q",
+      "promo2",
+      "level_vs_base",
+      "base_jump",
+      "last_month_yoy",
+      "last_month_vs_base"
+    ],
+    "missing_features": "fill with 0 (growth features are chain-relative)",
+    "label": "1 = store's next-quarter YoY growth in avg daily sales is in the chain's bottom 25%",
+    "classes": {
+      "0": "OK",
+      "1": "At risk (underperform next quarter)"
+    },
+    "decision_threshold": 0.5,
+    "train_snapshots": [
+      "2014Q1",
+      "2014Q2",
+      "2014Q3",
+      "2014Q4"
+    ],
+    "test_snapshot": "2015Q1 (label quarter 2015Q2)",
+    "deploy_snapshot": "2015Q2",
+    "xgb_params": {
+      "objective": "binary:logistic",
+      "base_score": null,
+      "booster": null,
+      "callbacks": null,
+      "colsample_bylevel": null,
+      "colsample_bynode": null,
+      "colsample_bytree": 0.8,
+      "device": null,
+      "early_stopping_rounds": null,
+      "enable_categorical": true,
+      "eval_metric": null,
+      "feature_types": null,
+      "feature_weights": null,
+      "gamma": null,
+      "grow_policy": null,
+      "importance_type": null,
+      "interaction_constraints": null,
+      "learning_rate": 0.05,
+      "max_bin": null,
+      "max_cat_threshold": null,
+      "max_cat_to_onehot": null,
+      "max_delta_step": null,
+      "max_depth": 3,
+      "max_leaves": null,
+      "min_child_weight": null,
+      "missing": NaN,
+      "monotone_constraints": null,
+      "multi_strategy": null,
+      "n_estimators": 200,
+      "n_jobs": 2,
+      "num_parallel_tree": null,
+      "random_state": 42,
+      "reg_alpha": null,
+      "reg_lambda": null,
+      "sampling_method": null,
+      "scale_pos_weight": 3,
+      "subsample": 0.8,
+      "tree_method": null,
+      "validate_parameters": null,
+      "verbosity": null
+    },
+    "test_metrics": {
+      "accuracy": 0.8359,
+      "precision": 0.642,
+      "recall": 0.7778,
+      "F1": 0.7034,
+      "ROC-AUC": 0.8961
+    },
+    "cross_validated_auc": 0.8757,
+    "revenue_at_risk": {
+      "formula": "P(at risk) x Q2 2015 revenue x typical shortfall",
+      "typical_shortfall": 0.0824
+    }
+  },
+  "library_versions": {
+    "xgboost": "3.4.1",
+    "scikit-learn": "1.9.1",
+    "pandas": "3.0.5",
+    "numpy": "2.5.3",
+    "shap": "0.52.0"
+  }
+}
