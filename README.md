@@ -172,3 +172,5 @@ ALL 12 TEST SUITES PASSED PERFECTLY (100% SUCCESS)!
 2. Start Command: `python run.py` or `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 3. Install Command: `pip install -r requirements.txt`
 4. Persistent Disk: Mount `/data` or `/app/db` to persist SQLite records, or specify a PostgreSQL `DATABASE_URL`.
+#   r e a t i l i q  
+ 
